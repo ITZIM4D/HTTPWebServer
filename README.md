@@ -4,10 +4,10 @@
   <a href="https://github.com/ITZIM4D/NoNMAP">
   </a>
 
-<h3 align="center">NoNMAP</h3>
+<h3 align="center">WebServer</h3>
 
   <p align="center">
-    A basic port scanner like NMAP written in python. 
+    A multithreaded HTTP server using a fixed size thread pool to handle concurrent connections and tasks 
     <br />
   </p>
 </div>
@@ -37,10 +37,9 @@
 
 
 
-<!-- ABOUT THE PROJECT -->
 ## About The Project
 
-To learn more about networking and cybersecurity I wanted to recreate NMAP in a basic way and then keep adding onto it. This project is my first step in doing that and I am hoping to create more projects like this in the future.
+To increase my knowledge of threads and backend applications I want to make an HTTP server that I will continue to build off of.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -48,20 +47,12 @@ To learn more about networking and cybersecurity I wanted to recreate NMAP in a 
 
 ### Built With
 
-* Python
-* Socket (Standard Library)
-* sys (Standard Library)
-* json (standard Library)
+* C++
+* Docker
 
 ### Functionality Included
 
-* Command-line argument parsing using `sys.argv`
-* Reads target IP address from user input
-* Loads common ports from `commonPorts.json`
-* Scans TCP ports using Python sockets
-* Uses timeout-based connection checks
-* Identifies and prints open ports
-* Iterates through a predefined list of common ports
+* 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -73,29 +64,23 @@ To learn more about networking and cybersecurity I wanted to recreate NMAP in a 
 
 ### Prerequisites
 
-* Python 
-Either use `brew install python` on Mac or go to [Python's Website](https://www.python.org/downloads/) and download it from there
+* Docker
+Either use `brew install Docker` on Mac or go to [Docker's Website](https://www.docker.com/products/docker-desktop/) and download it from there
 
 ### Installation
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/ITZIM4D/NoNMAP.git
+   git clone https://github.com/ITZIM4D/HTTPWebServer.git
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- USAGE EXAMPLES -->
 ## Usage
 
-* Scan an IP 
+* Build the docker image (include --no-cache for a clean build)
 ``` bash
-❯ python3 NoNMAP.py 127.0.0.1
-Scanning common ports on 127.0.0.1
-Port 3306 is open
-Port 5432 is open
+❯ docker build --no-cache -t webserver . && docker run webserver
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
