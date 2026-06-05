@@ -2,17 +2,28 @@
 #define THREADPOOL_H
 
 #include <thread>
+#include <iostream>
 
 using std::thread;
 
-// Template function for addThread function parameter
-template <typename T> T
-
+/**
+ * @brief A thread pool that will allocate threads to tasks
+ */
 class ThreadPool {
     public:
-        void addThread() 
+        void start()
+        void queueJob(const std::function<void()>& job);
+        void stop();
+        bool busy();
+
     private:
-        std::vector<thread> threadPool;
-}
+        bool shouldTerminate = false; 
+        std::mutex queue_mutex
+        std::condition_variable mutex_condition; 
+        std::vector<std::thread> threads;
+        std::queue<std::function<void()>> jobs;
+
+        void threadLoop();
+};
 
 #endif
