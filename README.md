@@ -83,4 +83,10 @@ Either use `brew install Docker` on Mac or go to [Docker's Website](https://www.
 ❯ docker build --no-cache -t webserver . && docker run webserver
 ```
 
+* When the server is running you can send a TCP message to see it's working with 
+``` bash
+❯ nc localhost 8080
+    test message
+```
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

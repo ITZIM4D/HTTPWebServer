@@ -8,6 +8,7 @@ project(WebServer)
 add_executable(WebServer
     src/main.cpp
     src/ThreadPool.cpp
+    src/SocketServer.cpp
 )
 
 include_directories(
