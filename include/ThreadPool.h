@@ -11,15 +11,15 @@ using std::thread;
  */
 class ThreadPool {
     public:
-        void start()
+        void start();
         void queueJob(const std::function<void()>& job);
         void stop();
         bool busy();
 
     private:
         bool shouldTerminate = false; 
-        std::mutex queue_mutex
-        std::condition_variable mutex_condition; 
+        std::mutex queueMutex;
+        std::condition_variable mutexCondition; 
         std::vector<std::thread> threads;
         std::queue<std::function<void()>> jobs;
 
