@@ -9,7 +9,7 @@ SocketServer::SocketServer(int port) {
 
     serverAddress_.sin_family = AF_INET;
     serverAddress_.sin_port = htons(port);
-    serverAddress_.sin_addr.s_addr = INADDR_ANY;
+    serverAddress_.sin_addr.s_addr = INADDR_ANY; 
 
     // Bind socket to address
     bind(serverSocket_, (struct sockaddr*)&serverAddress_, sizeof(serverAddress_));
@@ -21,38 +21,29 @@ void SocketServer::run() {
 
     listen(serverSocket_, 5);
     // Accept client connection
-    int clientSocket = accept(serverSocket_, nullptr, nullptr);
+    //int clientSocket = accept(serverSocket_, nullptr, nullptr);
+    
+    pollfd fds{serverSocket_, POLL_IN};
 
-    char rBuffer[1024] = {0};
-    recv(clientSocket, rBuffer, sizeof(rBuffer), 0);
+    // Poll every 1 second for a connection 
+    while(poll(&fds, 1, 1000) < 1) {
+        std::cout << "Waiting for connection... " << std::endl;
+    }
 
-    char sBuffer[1024] = {0};
-    serveFile("./html/index.html", sBuffer, 1024);
+    std::cout << "Connection found!";
 
-    send(clientSocket, sBuffer, sizeof(sBuffer), 0);
-    std::cout << "Message from client " << rBuffer << std::endl;
+    //char rBuffer[1024] = {0};
+    //recv(clientSocket, rBuffer, sizeof(rBuffer), 0);
+
+    //std::cout << "Message from client:\n" << rBuffer << std::endl;
+    //
+    //TODO: Make this parse the requested file for a get request and send it back
+    //char arr[200]="HTTP/1.1 200 OK\nContent-Type:text/html\nContent-Length: 16\n\n<h1>testing</h1>";
+    //int send_res=send(clientSocket,arr,sizeof(arr),0);
 }
 
 void SocketServer::stop() {
     // Close server and clean up 
     close(serverSocket_);
     threadPool_.stop();
-}
-
-void SocketServer::serveFile(std::string path, char sBuffer[], size_t sBufferSize) {
-    // Open file 
-    std::ifstream file(path);
-    char c;
-    size_t curr = 0;
-
-    if (!file.is_open()) {
-        std::cerr << "Error opening file " << path << std::endl;
-        return;
-    } 
-    
-    while (file.get(c) && curr < sBufferSize) {
-        sBuffer[curr++] = c;
-    }
-
-    file.close();
 }
