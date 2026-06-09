@@ -1,15 +1,13 @@
 #include <iostream>
 
-#include "ThreadPool.h"
 #include "SocketServer.h"
 
-int main () {
-    ThreadPool threadPool;
-    threadPool.start(); 
-    
-    SocketServer server;    
+int main () {    
+    SocketServer server(8080);    
+    server.run();
 
-    threadPool.stop();
+    server.stop();
+
     return 0;
 }
 
