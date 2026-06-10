@@ -38,13 +38,33 @@ void SocketServer::run() {
 
         }
 
-        std::cout << "Socket connected #" << sockets_.size() << std::endl;
-        sockets_.emplace_back(std::make_unique<Socket>(
-            Socket{accept(serverSocket_, nullptr, nullptr)} 
-        ));
+        std::cout << "Socket connected" << std::endl;
 
-        recv(sockets_[0]->sockFD, sockets_[0]->rBuffer, sizeof(sockets_[0]->rBuffer), 0);
-        std::cout << sockets_[0]->rBuffer << std::endl;
+        // Accept the socket and add it to the sockets vector
+        int clientFD = accept(serverSocket_, nullptr, nullptr);
+        sockets_.emplace_back(std::make_unique<Socket>(Socket{clientFD}));
+        
+        // Create a function to add to threadPool_ job queue
+        std::function<void()> receive = [&, clientFD]() {
+
+            // Find clientFD in sockets otherwise return
+            int clientIndex = if find socket in sockets_ where socket.sockFD == client clientIndex == socket index
+
+            size_t bytesReceived = recv(sockets_[clientFD]->sockFD, sockets_[clientFD]->rBuffer, sizeof(sockets_[0]->rBuffer), 0);
+            std::cout << "Client " << clientFD << " sent: " << std::endl;
+            std::cout << sockets_[clientFD]->rBuffer << std::endl;
+            
+            // Act on received buffer and clear buffer
+            std::fill_n(sockets_[clientFD]->rBuffer, sizeof(sockets_[clientFD]->rBuffer), 0);
+
+            if (bytesReceived > 0) {
+                threadPool_.queueJob(receive);
+            } else {
+                return;
+            }
+        };
+
+        threadPool_.queueJob(receive);
     }
 
         //TODO: Make this parse the requested file for a get request and send it back

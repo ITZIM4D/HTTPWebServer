@@ -10,6 +10,7 @@
 #include <iostream>
 #include <cerrno>
 #include <fstream>
+#include <algorithm>
 
 #include <poll.h>
 #include <sys/socket.h>
