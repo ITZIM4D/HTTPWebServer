@@ -55,9 +55,10 @@ class SocketServer {
 
     private:
         int serverSocket_;           /// File descriptor respresenting the servers socket  
-        sockaddr_in serverAddress_; 
+        sockaddr_in serverAddress_;
         ThreadPool threadPool_;
         std::vector<std::unique_ptr<Socket>> sockets_;
+        bool serverRunning_ = false;
         
         /**
          * @brief Serves a file based on a GET request for the specified file

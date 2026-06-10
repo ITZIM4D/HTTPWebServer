@@ -16,34 +16,45 @@ SocketServer::SocketServer(int port) {
 }
 
 void SocketServer::run() {
+    serverRunning_ = true;
     // Start up the threadpool
     threadPool_.start();
-
-    listen(serverSocket_, 5);
-    // Accept client connection
-    //int clientSocket = accept(serverSocket_, nullptr, nullptr);
     
-    pollfd fds{serverSocket_, POLL_IN};
+    listen(serverSocket_, 5);
 
-    // Poll every 1 second for a connection 
-    while(poll(&fds, 1, 1000) < 1) {
-        std::cout << "Waiting for connection... " << std::endl;
+    pollfd fds{serverSocket_, POLL_IN};
+    int pollValue;
+
+    while (serverRunning_) {
+        // Poll for connection every tenth of a secoond
+        while ((pollValue = poll(&fds, 1, 100)) == 0) {
+            ;            
+        }
+
+        // If poll returns an error
+        if (pollValue == -1) {
+            std::cerr << "Polling Error (errno: " << errno << ")" << std::endl;
+            return;
+
+        }
+
+        std::cout << "Socket connected #" << sockets_.size() << std::endl;
+        sockets_.emplace_back(std::make_unique<Socket>(
+            Socket{accept(serverSocket_, nullptr, nullptr)} 
+        ));
+
+        recv(sockets_[0]->sockFD, sockets_[0]->rBuffer, sizeof(sockets_[0]->rBuffer), 0);
+        std::cout << sockets_[0]->rBuffer << std::endl;
     }
 
-    std::cout << "Connection found!";
-
-    //char rBuffer[1024] = {0};
-    //recv(clientSocket, rBuffer, sizeof(rBuffer), 0);
-
-    //std::cout << "Message from client:\n" << rBuffer << std::endl;
-    //
-    //TODO: Make this parse the requested file for a get request and send it back
-    //char arr[200]="HTTP/1.1 200 OK\nContent-Type:text/html\nContent-Length: 16\n\n<h1>testing</h1>";
-    //int send_res=send(clientSocket,arr,sizeof(arr),0);
+        //TODO: Make this parse the requested file for a get request and send it back
+        //char arr[200]="HTTP/1.1 200 OK\nContent-Type:text/html\nContent-Length: 16\n\n<h1>testing</h1>";
+        //int send_res=send(clientSocket,arr,sizeof(arr),0);
 }
 
 void SocketServer::stop() {
     // Close server and clean up 
+    serverRunning_ = false;
     close(serverSocket_);
     threadPool_.stop();
 }

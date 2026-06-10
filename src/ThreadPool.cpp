@@ -3,7 +3,11 @@
 void ThreadPool::start() {
     int numThreads = std::thread::hardware_concurrency();
     for (int i = 0; i < numThreads; i++) {
-        threads.emplace_back(std::thread(&ThreadPool::threadLoop, this));
+        try {
+            threads.emplace_back(std::thread(&ThreadPool::threadLoop, this));
+        } catch (std::exception e) {
+            std::cout << "Blectop " << e.what() << std::endl;
+        }
     }
 }
 
@@ -25,12 +29,12 @@ void ThreadPool::threadLoop() {
     }
 }
 
-void ThreadPool::queueJob(const std::function<void()>& job) {
+void ThreadPool::queueJob(const std::function<void()>& job) {    
     {
     std::unique_lock<std::mutex> lock(queueMutex);
     jobs.push(job);
-    }
-    mutexCondition.notify_one();
+    }    
+    mutexCondition.notify_one();    
 }
 
 bool ThreadPool::busy() {
