@@ -6,7 +6,7 @@ void ThreadPool::start() {
         try {
             threads.emplace_back(std::thread(&ThreadPool::threadLoop, this));
         } catch (std::exception e) {
-            std::cout << "Blectop " << e.what() << std::endl;
+            std::cout << "Error creating thread " << e.what() << std::endl;
         }
     }
 }

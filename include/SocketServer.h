@@ -64,12 +64,9 @@ class SocketServer {
         bool serverRunning_ = false;
         
         /**
-         * @brief Serves a file based on a GET request for the specified file
-         *
-         * @param[in] socket The client socket that is requesting the file
-         * @param[in] path The path of the file being requested
+         * @brief parses a request and formats it
          */
-        void serveFile(int socket, std::string path);
+        void parseHTTP(std::string request);
 };
 
 #endif

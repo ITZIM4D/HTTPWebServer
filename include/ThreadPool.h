@@ -54,6 +54,14 @@ class ThreadPool {
          * @brief Loop that threads run through and check/wait for a job to open up
          */
         void threadLoop();
+
+        /**
+         * @brief Template function so threads can accept variadic arguments
+         */
+        template<typename f, typename... Args>
+        void enqueue(f&& func, Args&&... args) {
+            auto job = 
+        }
 };
 
 #endif

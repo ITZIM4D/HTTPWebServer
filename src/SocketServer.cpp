@@ -48,7 +48,9 @@ void SocketServer::run() {
                     SocketData& socketData = it->second;
                     size_t msg = recv(fd.fd, socketData.rBuffer, 4096, 0);
                     if (msg == 0) {toRemove.push(fd);continue;}
-                    std::cout << socketData.rBuffer << std::endl;
+                    
+                    // Parse the HTTP request
+                    threadPool_.queueJob(parseHTTP,std::string{socketData.rBuffer});
                     std::fill_n(socketData.rBuffer, 4096, 0); 
                 }
             }
@@ -80,4 +82,8 @@ void SocketServer::stop() {
     serverRunning_ = false;
     close(serverSocket_);
     threadPool_.stop();
+}
+
+void SocketServer::parseHTTP(std::string request) {
+    std::cout << request << std::endl;  
 }
