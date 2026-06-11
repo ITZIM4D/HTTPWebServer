@@ -24,10 +24,9 @@
  *
  * @brief A socket structure that just contains the socket file descriptor and send/receive buffers
  */
-struct Socket {
-    int sockFD; /// File descriptor for the socket
-    char rBuffer[1024];
-    char sBuffer[1024];
+struct SocketData {
+    char rBuffer[4096];
+    char sBuffer[4096];
 };
 
 /**
@@ -58,7 +57,10 @@ class SocketServer {
         int serverSocket_;           /// File descriptor respresenting the servers socket  
         sockaddr_in serverAddress_;
         ThreadPool threadPool_;
-        std::vector<std::unique_ptr<Socket>> sockets_;
+        std::unordered_map<int, SocketData> sockets_;
+        std::vector<pollfd> fds;
+        std::stack<pollfd> toAdd; /// pollfds to add to fd
+        std::stack<pollfd> toRemove; /// pollfds to remove from fd
         bool serverRunning_ = false;
         
         /**
@@ -67,7 +69,7 @@ class SocketServer {
          * @param[in] socket The client socket that is requesting the file
          * @param[in] path The path of the file being requested
          */
-        void serveFile(Socket socket, std::string path);
+        void serveFile(int socket, std::string path);
 };
 
 #endif

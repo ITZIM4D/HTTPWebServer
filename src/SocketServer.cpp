@@ -22,49 +22,52 @@ void SocketServer::run() {
     
     listen(serverSocket_, 5);
 
-    pollfd fds{serverSocket_, POLL_IN};
-    int pollValue;
+    fds.push_back(pollfd{serverSocket_, POLL_IN, 0});
 
     while (serverRunning_) {
-        // Poll for connection every tenth of a secoond
-        while ((pollValue = poll(&fds, 1, 100)) == 0) {
-            ;            
-        }
+        // Poll for input on any open socket
+        int ready = poll(fds.data(), fds.size(), -1);
 
         // If poll returns an error
-        if (pollValue == -1) {
+        if (ready < 0) {
             std::cerr << "Polling Error (errno: " << errno << ")" << std::endl;
-            return;
-
+            continue;
         }
 
-        std::cout << "Socket connected" << std::endl;
-
-        // Accept the socket and add it to the sockets vector
-        int clientFD = accept(serverSocket_, nullptr, nullptr);
-        sockets_.emplace_back(std::make_unique<Socket>(Socket{clientFD}));
-        
-        // Create a function to add to threadPool_ job queue
-        std::function<void()> receive = [&, clientFD]() {
-
-            // Find clientFD in sockets otherwise return
-            int clientIndex = if find socket in sockets_ where socket.sockFD == client clientIndex == socket index
-
-            size_t bytesReceived = recv(sockets_[clientFD]->sockFD, sockets_[clientFD]->rBuffer, sizeof(sockets_[0]->rBuffer), 0);
-            std::cout << "Client " << clientFD << " sent: " << std::endl;
-            std::cout << sockets_[clientFD]->rBuffer << std::endl;
-            
-            // Act on received buffer and clear buffer
-            std::fill_n(sockets_[clientFD]->rBuffer, sizeof(sockets_[clientFD]->rBuffer), 0);
-
-            if (bytesReceived > 0) {
-                threadPool_.queueJob(receive);
-            } else {
-                return;
+        // For each open socket
+        for (auto& fd : fds) {
+            if (fd.revents & POLLIN) {
+                if (fd.fd == serverSocket_) {
+                    // Accept a client connection and add it to sockets map
+                    int clientSocket = accept(serverSocket_, nullptr, nullptr);
+                    sockets_.emplace(std::make_pair(clientSocket, SocketData{}));
+                    toAdd.push(pollfd{clientSocket, POLLIN, 0}); 
+                } else {
+                    auto it = sockets_.find(fd.fd);
+                    if (it == sockets_.end()) {return;}
+                    SocketData& socketData = it->second;
+                    size_t msg = recv(fd.fd, socketData.rBuffer, 4096, 0);
+                    if (msg == 0) {toRemove.push(fd);continue;}
+                    std::cout << socketData.rBuffer << std::endl;
+                    std::fill_n(socketData.rBuffer, 4096, 0); 
+                }
             }
-        };
+        }
 
-        threadPool_.queueJob(receive);
+        // Add and remove any sockets
+        while (!toAdd.empty()) {
+            fds.push_back(toAdd.top());
+            toAdd.pop();
+        } 
+        while (!toRemove.empty()) {
+            auto it = std::find_if(fds.begin(), fds.end(), 
+                [&](const pollfd& p) {
+                    return p.fd == toRemove.top().fd;
+                }
+            );
+            fds.erase(it);
+            toRemove.pop();
+        }
     }
 
         //TODO: Make this parse the requested file for a get request and send it back
