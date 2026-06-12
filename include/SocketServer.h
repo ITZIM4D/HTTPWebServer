@@ -43,6 +43,21 @@ class SocketServer {
          */
         SocketServer(int port); 
 
+
+        /// Destructor
+        ~SocketServer() {
+            stop(); 
+        } 
+
+        /// Copy constructor 
+        SocketServer(const SocketServer& other) {
+             
+        } 
+
+        /// Move constructor
+        
+        /// Copy Assignment operator
+
         /**
          * @brief Starts the socket server listening on the port it is assigned
          */
@@ -55,6 +70,8 @@ class SocketServer {
 
         /**
          * @brief parses a request and formats it
+         *
+         * @param[in] request String of the HTTP request to be parsed
          */
         void parseHTTP(std::string request);
 
@@ -66,9 +83,7 @@ class SocketServer {
         std::vector<pollfd> fds;
         std::stack<pollfd> toAdd; /// pollfds to add to fd
         std::stack<pollfd> toRemove; /// pollfds to remove from fd
-        bool serverRunning_ = false;
-        
-        
+        bool serverRunning_ = false;        
 };
 
 #endif

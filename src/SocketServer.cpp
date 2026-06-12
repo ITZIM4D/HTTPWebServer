@@ -80,7 +80,14 @@ void SocketServer::run() {
 void SocketServer::stop() {
     // Close server and clean up 
     serverRunning_ = false;
-    close(serverSocket_);
+    if (serverSocket_ != -1) close(serverSocket_);
+    serverSocket_ = -1;
+
+    for (auto i : sockets_) {
+        if (i->first != -1) close(i->first);
+    }
+    sockets_.clear();
+
     threadPool_.stop();
 }
 
