@@ -50,7 +50,7 @@ void SocketServer::run() {
                     if (msg == 0) {toRemove.push(fd);continue;}
                     
                     // Parse the HTTP request
-                    threadPool_.queueJob(parseHTTP,std::string{socketData.rBuffer});
+                    threadPool_.enqueue([this](auto str){parseHTTP(str);},std::string{socketData.rBuffer});
                     std::fill_n(socketData.rBuffer, 4096, 0); 
                 }
             }

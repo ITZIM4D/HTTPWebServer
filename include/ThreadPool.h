@@ -43,6 +43,18 @@ class ThreadPool {
          */
         bool busy();
 
+        /**
+         * @brief Template function so threads can accept variadic arguments
+         */
+        template<typename F, typename... Args>
+
+        void enqueue(F&& func, Args&&... args) {
+            auto job = [f = std::forward<F>(func), ...args = std::forward<Args>(args)]() mutable{
+                f(args...);
+            };
+            queueJob(std::move(job));
+        }
+
     private:
         bool shouldTerminate = false; 
         std::mutex queueMutex; /// Mutex that all the threads refer to 
@@ -55,13 +67,7 @@ class ThreadPool {
          */
         void threadLoop();
 
-        /**
-         * @brief Template function so threads can accept variadic arguments
-         */
-        template<typename f, typename... Args>
-        void enqueue(f&& func, Args&&... args) {
-            auto job = 
-        }
+                
 };
 
 #endif

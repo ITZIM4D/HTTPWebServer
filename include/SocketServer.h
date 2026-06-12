@@ -53,6 +53,11 @@ class SocketServer {
          */
         void stop();
 
+        /**
+         * @brief parses a request and formats it
+         */
+        void parseHTTP(std::string request);
+
     private:
         int serverSocket_;           /// File descriptor respresenting the servers socket  
         sockaddr_in serverAddress_;
@@ -63,10 +68,7 @@ class SocketServer {
         std::stack<pollfd> toRemove; /// pollfds to remove from fd
         bool serverRunning_ = false;
         
-        /**
-         * @brief parses a request and formats it
-         */
-        void parseHTTP(std::string request);
+        
 };
 
 #endif

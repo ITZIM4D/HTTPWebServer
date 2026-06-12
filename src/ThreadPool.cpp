@@ -22,7 +22,7 @@ void ThreadPool::threadLoop() {
             if (shouldTerminate) {
                 return;
             }
-            job = jobs.front();
+            job = std::move(jobs.front());
             jobs.pop();
         }
         job();
