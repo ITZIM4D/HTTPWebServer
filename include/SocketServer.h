@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include "ThreadPool.h"
+#include "HTTPMessage.h"
 
 /**
  * @struct Socket
@@ -67,9 +68,7 @@ class SocketServer {
         std::vector<pollfd> fds;
         std::stack<pollfd> toAdd; /// pollfds to add to fd
         std::stack<pollfd> toRemove; /// pollfds to remove from fd
-        bool serverRunning_ = false;
-        
-        
+        bool serverRunning_ = false; 
 };
 
 #endif

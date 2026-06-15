@@ -86,10 +86,13 @@ void SocketServer::stop() {
 
 void SocketServer::parseHTTP(std::string request) {
     /* Local Variables */
+    HTTPMessage message;    
     std::istringstream iss(request);
-    std::string startLine; 
+    RequestMethod method;     
     
-    // Get first line of request
-    std::getline(iss, startLine);
-    std::cout << startLine << std::endl;  
+
+    //TODO: Convert first string (iss >> method) into method enum
+
+    message.setRequestMethod(method);
+    std::cout << message.getRequestMethod() << std::endl;
 }

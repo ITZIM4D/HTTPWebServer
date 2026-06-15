@@ -10,7 +10,7 @@ add_executable(WebServer
     src/main.cpp
     src/ThreadPool.cpp
     src/SocketServer.cpp
-    src/HTTPMessage
+    src/HTTPMessage.cpp
 )
 
 include_directories(

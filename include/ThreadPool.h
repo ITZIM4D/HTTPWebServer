@@ -45,6 +45,9 @@ class ThreadPool {
 
         /**
          * @brief Template function so threads can accept variadic arguments
+         *
+         * @param[in] func Function that will be called
+         * @param[in] args Variadic list of argmuents to call with the function
          */
         template<typename F, typename... Args>
 
