@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <fstream>
 #include <algorithm>
+#include <sstream>
 
 #include <poll.h>
 #include <sys/socket.h>

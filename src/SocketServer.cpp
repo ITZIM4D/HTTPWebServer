@@ -85,5 +85,11 @@ void SocketServer::stop() {
 }
 
 void SocketServer::parseHTTP(std::string request) {
-    std::cout << request << std::endl;  
+    /* Local Variables */
+    std::istringstream iss(request);
+    std::string startLine; 
+    
+    // Get first line of request
+    std::getline(iss, startLine);
+    std::cout << startLine << std::endl;  
 }
