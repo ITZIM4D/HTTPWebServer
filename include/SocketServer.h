@@ -57,8 +57,17 @@ class SocketServer {
 
         /**
          * @brief parses a request and formats it
+         *
+         * @param[in] request The http request to parse
          */
         void parseHTTP(std::string request);
+
+        /**
+         * @brief serves a requested file to a user
+         *
+         * @param[in] path The html file to be served
+         */
+        void serveFile(std::string path);
 
     private:
         int serverSocket_;           /// File descriptor respresenting the servers socket  
@@ -69,6 +78,7 @@ class SocketServer {
         std::stack<pollfd> toAdd; /// pollfds to add to fd
         std::stack<pollfd> toRemove; /// pollfds to remove from fd
         bool serverRunning_ = false; 
+        std::unordered_map<std::string, std::string> endpoints_;
 };
 
 #endif

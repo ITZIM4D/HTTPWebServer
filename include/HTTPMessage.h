@@ -14,7 +14,7 @@ enum RequestMethod {
     POST,
     PATCH,
     DELETE,
-    NONE = 0
+    NONE = -1
 };
 
 /**

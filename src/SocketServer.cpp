@@ -88,11 +88,46 @@ void SocketServer::parseHTTP(std::string request) {
     /* Local Variables */
     HTTPMessage message;    
     std::istringstream iss(request);
-    RequestMethod method;     
+    std::string method;     
+    std::string requestTarget;
+   
+    // Determine method type
+    iss >> method;
     
+    if (method == "GET") {
+        message.setRequestMethod(GET);
 
-    //TODO: Convert first string (iss >> method) into method enum
+        // Serve the request target
+        iss >> requestTarget;
 
-    message.setRequestMethod(method);
-    std::cout << message.getRequestMethod() << std::endl;
+        if (endpoints_.find(requestTarget) != endpoints_.end()) {
+            std::cout << endpoints_.at(requestTarget) << std::endl;
+        } else {
+            std::cout << "Return error endpoint not found" << std::endl;
+        }
+        
+    } else if (method == "HEAD") {
+        message.setRequestMethod(HEAD);
+    } else if (method == "PUT") {
+        message.setRequestMethod(PUT);
+    } else if (method == "CONNECT") {
+        message.setRequestMethod(CONNECT);
+    } else if (method == "OPTIONS") {
+        message.setRequestMethod(OPTIONS);
+    } else if (method == "TRACE") {
+        message.setRequestMethod(TRACE);
+    } else if (method == "POST") {
+        message.setRequestMethod(POST);
+    } else if (method == "PATCH") {
+        message.setRequestMethod(PATCH);
+    } else if (method == "DELETE") {
+        message.setRequestMethod(DELETE);
+    } else {
+        message.setRequestMethod(NONE);
+    }
+}
+
+void SocketServer::serveFile(std::string path) {
+    // Try to find file
+    
 }
