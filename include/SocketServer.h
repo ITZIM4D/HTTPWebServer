@@ -12,6 +12,7 @@
 #include <fstream>
 #include <algorithm>
 #include <sstream>
+#include <fstream>
 
 #include <poll.h>
 #include <sys/socket.h>
@@ -59,15 +60,26 @@ class SocketServer {
          * @brief parses a request and formats it
          *
          * @param[in] request The http request to parse
+         *
+         * @return An HTTPMessage object for the client
          */
-        void parseHTTP(std::string request);
+        HTTPMessage parseHTTP(std::string request);
 
         /**
          * @brief serves a requested file to a user
          *
          * @param[in] path The html file to be served
+         * @param[out] htmlFile String of the file at the path
          */
-        void serveFile(std::string path);
+        void serveFile(std::string path, std::string& htmlFile);
+
+        /**
+         * @brief Adds an endpoint to the endpoint map
+         *
+         * @param[in] endpoint Endpoint that maps to a path
+         * @param[in] path Path mapped to by the endpoint
+         */
+        void addEndpoint(std::string endpoint, std::string path);
 
     private:
         int serverSocket_;           /// File descriptor respresenting the servers socket  

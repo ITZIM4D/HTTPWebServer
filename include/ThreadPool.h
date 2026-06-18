@@ -52,7 +52,7 @@ class ThreadPool {
         template<typename F, typename... Args>
 
         void enqueue(F&& func, Args&&... args) {
-            auto job = [f = std::forward<F>(func), ...args = std::forward<Args>(args)]() mutable{
+            auto job = [f = std::forward<F>(func), ...args = std::forward<Args>(args)]() mutable {
                 f(args...);
             };
             queueJob(std::move(job));

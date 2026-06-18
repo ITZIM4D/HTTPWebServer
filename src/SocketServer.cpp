@@ -1,6 +1,7 @@
 #include "SocketServer.h"
 
 SocketServer::SocketServer(int port) {
+    // Initialize socket for server
     serverSocket_ = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket_== -1) {
         std::cerr << "Error Creating Server Socket, Error: " << errno << std::endl;
@@ -13,6 +14,8 @@ SocketServer::SocketServer(int port) {
 
     // Bind socket to address
     bind(serverSocket_, (struct sockaddr*)&serverAddress_, sizeof(serverAddress_));
+    // Add Endpoints
+    addEndpoint("/", "./html/index.html");
 }
 
 void SocketServer::run() {
@@ -43,15 +46,24 @@ void SocketServer::run() {
                     sockets_.emplace(std::make_pair(clientSocket, SocketData{}));
                     toAdd.push(pollfd{clientSocket, POLLIN, 0}); 
                 } else {
+                    //TODO: mutex here so two things don't get the same socket? unless enqueue's mutex
+                    //works for this too?
+
                     auto it = sockets_.find(fd.fd);
                     if (it == sockets_.end()) {return;}
                     SocketData& socketData = it->second;
                     size_t msg = recv(fd.fd, socketData.rBuffer, 4096, 0);
                     if (msg == 0) {toRemove.push(fd);continue;}
                     
+                    std::cout << "Before " << socketData.sBuffer[0] << std::endl;
+
+                    std::string test{"Hello"};
                     // Parse the HTTP request
-                    threadPool_.enqueue([this](auto str){parseHTTP(str);},std::string{socketData.rBuffer});
+                    threadPool_.enqueue([this](std::string& test){parseHTTP("");test = "goodbye";}, std::ref(test));
                     std::fill_n(socketData.rBuffer, 4096, 0); 
+
+                    std::cout << test << std::endl;
+                    std::cout << "After " << socketData.sBuffer[0] << std::endl;
                 }
             }
         }
@@ -84,7 +96,7 @@ void SocketServer::stop() {
     threadPool_.stop();
 }
 
-void SocketServer::parseHTTP(std::string request) {
+HTTPMessage SocketServer::parseHTTP(std::string request) {
     /* Local Variables */
     HTTPMessage message;    
     std::istringstream iss(request);
@@ -101,7 +113,9 @@ void SocketServer::parseHTTP(std::string request) {
         iss >> requestTarget;
 
         if (endpoints_.find(requestTarget) != endpoints_.end()) {
-            std::cout << endpoints_.at(requestTarget) << std::endl;
+            std::string servedFile;
+            serveFile(endpoints_.find(requestTarget)->second, servedFile);
+            std::cout << "Served File:\n" << servedFile << std::endl;
         } else {
             std::cout << "Return error endpoint not found" << std::endl;
         }
@@ -125,9 +139,28 @@ void SocketServer::parseHTTP(std::string request) {
     } else {
         message.setRequestMethod(NONE);
     }
+
+    return message;
 }
 
-void SocketServer::serveFile(std::string path) {
+void SocketServer::serveFile(std::string path, std::string& htmlFile) {
     // Try to find file
-    
+    std::ifstream file(path);
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening " << path << std::endl;
+        return;
+    }
+
+    htmlFile.assign((std::istreambuf_iterator<char>(file)),
+                    (std::istreambuf_iterator<char>()));
+    file.close();
+}
+
+void SocketServer::addEndpoint(std::string endpoint, std::string path) {
+    if (endpoints_.find(endpoint) == endpoints_.end()) {
+        endpoints_.insert({endpoint, path});
+    } else {
+        std::cerr << "Cannot create endpoint " << endpoint << "(Endpoint already exists)" << std::endl;
+    }
 }
