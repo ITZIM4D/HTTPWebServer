@@ -20,7 +20,6 @@
 #include <unistd.h>
 
 #include "ThreadPool.h"
-#include "HTTPMessage.h"
 
 /**
  * @struct Socket
@@ -28,8 +27,8 @@
  * @brief A socket structure that just contains the socket file descriptor and send/receive buffers
  */
 struct SocketData {
-    char rBuffer[4096];
-    char sBuffer[4096];
+    std::array<char, 4096> rBuffer;
+    std::array<char, 4096> sBuffer;
 };
 
 /**
@@ -39,6 +38,8 @@ struct SocketData {
  */
 class SocketServer {
     public:
+
+        static const size_t BUFFER_SIZE = 4096;
         /**
          * @brief Creates the initial server socket and starts listening on a port
          *
@@ -57,21 +58,21 @@ class SocketServer {
         void stop();
 
         /**
-         * @brief parses a request and formats it
+         * @brief parses a request and sends a response to the socket
          *
-         * @param[in] request The http request to parse
+         * @param[in] socketData The data of the requesting socket
          *
-         * @return An HTTPMessage object for the client
          */
-        HTTPMessage parseHTTP(std::string request);
+        void parseHTTP(SocketData socketData);
 
         /**
          * @brief serves a requested file to a user
          *
          * @param[in] path The html file to be served
          * @param[out] htmlFile String of the file at the path
+         * @param[out] contentLength The length of the html file
          */
-        void serveFile(std::string path, std::string& htmlFile);
+        void serveFile(std::string path, std::array<char, BUFFER_SIZE>& htmlFile, int& contentLength);
 
         /**
          * @brief Adds an endpoint to the endpoint map
