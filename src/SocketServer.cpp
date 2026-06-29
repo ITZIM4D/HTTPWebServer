@@ -52,6 +52,7 @@ void SocketServer::run() {
                     auto it = sockets_.find(fd.fd);
                     if (it == sockets_.end()) {return;}
                     SocketData& socketData = it->second;
+                    const int& clientSocket = it->first;
                     size_t msg = recv(fd.fd, socketData.rBuffer.data(), socketData.rBuffer.size() - 1, 0);
                     socketData.rBuffer[socketData.rBuffer.size()] = '\0';
                     if (msg == 0) {toRemove.push(fd);continue;}
@@ -59,7 +60,7 @@ void SocketServer::run() {
                     // Parse the HTTP request
                     threadPool_.enqueue([&, this](){
                             // Parse the socket data (Sends response in function)
-                            parseHTTP(socketData);
+                            parseHTTP(socketData, clientSocket);
 
                             // Clear buffers
                             socketData.rBuffer.fill(0);
@@ -94,7 +95,7 @@ void SocketServer::stop() {
     threadPool_.stop();
 }
 
-void SocketServer::parseHTTP(SocketData socketData) {
+void SocketServer::parseHTTP(SocketData socketData, const int& clientSocket) {
     /* Local Variables */
     std::string request = socketData.rBuffer.data();
     std::istringstream iss(request);
@@ -114,15 +115,12 @@ void SocketServer::parseHTTP(SocketData socketData) {
 
             // Append a header onto the send buffer
             std::string finalHTTP = "HTTP/1.1 200 OK\nContent-Type:text/html\nContent-Length: " 
-                + std::string(contentLength) + "\n\n" + socketData.sBuffer;
-            std::cout << finalHTTP << std::endl;
+                + std::to_string(contentLength) + "\n\n" 
+                + std::string(socketData.sBuffer.begin(), socketData.sBuffer.end());
 
             // Send file back to socket
+            int sendRes = send(clientSocket, finalHTTP.data(), finalHTTP.size(),0);
             
-            //TODO: Make this parse the requested file for a get request and send it back
-            //char arr[200]="HTTP/1.1 200 OK\nContent-Type:text/html\nContent-Length: 16\n\n<h1>testing</h1>";
-            //int send_res=send(clientSocket,arr,sizeof(arr),0);
-            std::cout << "Served File:\n" << socketData.sBuffer.data() << std::endl;
         } else {
             std::cout << "Return error endpoint not found" << std::endl;
         }

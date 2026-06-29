@@ -61,9 +61,10 @@ class SocketServer {
          * @brief parses a request and sends a response to the socket
          *
          * @param[in] socketData The data of the requesting socket
+         * @param[in] clientSocket The fd of the socket to send the response to
          *
          */
-        void parseHTTP(SocketData socketData);
+        void parseHTTP(SocketData socketData, const int& clientSocket);
 
         /**
          * @brief serves a requested file to a user
